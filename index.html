@@ -1,0 +1,754 @@
+<!-- html boiler -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Scripts</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://causewaysecurities--c.vf.force.com/resource/1599236147000/Highstockjs?"></script>
+
+    <style>
+        .test-border {
+            border: 1px solid black;
+        }
+
+        @font-face {
+            font-family: 'Avenir Next LT Pro';
+            src: url('Avenir Next LT Pro Regular.otf');
+        }
+
+        body {
+            font-family: 'Avenir Next LT Pro';
+            letter-spacing: 0.1mm;
+        }
+
+        #genpdf {}
+
+        .navy-text {
+            color: #232C51
+        }
+
+        .navy-background {
+            background-color: #1D2E53;
+        }
+
+        .dotted-border {
+            border: 0.1mm dotted #E3E3E3;
+        }
+
+        .pa-left-col {
+            width: 16%;
+        }
+
+        .sub-section-header {
+            background-color: #1D2E53;
+            color: white;
+            font-size: 3.5mm;
+            height: 4mm;
+            padding-top: 1.8mm;
+            padding-bottom: 1.8mm;
+            padding-left: 2mm;
+        }
+
+        .sub-section-margin {
+            margin-top: 5mm;
+            margin-bottom: 5mm;
+        }
+
+        .grey {
+            color: #CECECE;
+        }
+
+        .grey-background {
+            background-color: #CECECE;
+        }
+
+        .grey-border-right {
+            border-right: 0.4mm solid #CECECE
+        }
+
+        .grey-border-bottom {
+            border-bottom: 0.4mm solid #CECECE;
+        }
+
+        .table-style-1-col {
+            width: 50%;
+            font-size: 3mm;
+            padding: 1.5mm;
+        }
+
+        .table-style-1-col-left-text {
+            font-weight: bold;
+            width: 40%;
+        }
+
+        .table-style-1-col-right-text {
+            width: 60%;
+        }
+
+        .table-style-1-col-content {
+            display: flex;
+        }
+
+        .navy-border {
+            border: 0.8mm solid #1D2E53;
+            border-collapse: separate !important;
+            border-spacing: 0;
+        }
+
+        .underlying-table table td {
+            padding-top: 3mm;
+            padding-bottom: 3mm;
+        }
+
+        .note-performance-table td {
+            padding-top: 3mm;
+            padding-bottom: 3mm;
+        }
+
+
+        .positive-decimal {
+            color: #00A651;
+        }
+
+        .negative-decimal {
+            color: #FF0000;
+        }
+
+        .footer {
+            margin-top: 10mm;
+        }
+
+        .content-margins {
+            margin-top: 3mm;
+            margin-left: 7mm;
+            margin-right: 7mm
+        }
+
+        .gold {
+            color: #D0A31B;
+        }
+
+        .events-header {
+            font-size: 4mm;
+        }
+
+        .icon-and-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon {
+            width: 3.5mm;
+            height: 3.5mm;
+            margin-right: 1.5mm;
+        }
+
+        .coupon-and-call-events tr {
+            height: 10mm;
+        }
+
+        .non-call-period {
+            background-color: #F4F3F3;
+        }
+
+        .footer-text {
+            font-size: 2.1mm;
+            font-weight: 200;
+        }
+    </style>
+    <script>
+        //html2pdf open pdf in new tab
+        setTimeout(() => {
+            //document.getElementById('genpdf').addEventListener('click', function () {
+                fetch('strikedata.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(document.getElementById('graph-rendered'))
+                        Highcharts.stockChart("graph-rendered", {
+                            scrollbar: {
+                                enabled: false
+                            },
+                            navigator: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: true,
+                                layout: "horizontal",
+                                maxHeight: 100
+                            },
+                            rangeSelector: {
+                                inputEnabled: false,
+                                buttonTheme: {
+                                    visibility: "hidden"
+                                },
+                                labelStyle: {
+                                    visibility: "hidden"
+                                }
+                            },
+                            yAxis: {
+                                labels: {
+                                    formatter: function () {
+                                        return (this.value > 0 ? "" : "") + this.value +
+                                            "%";
+                                    }
+                                },
+                                opposite: false,
+                                plotLines: [{
+                                    value: 0,
+                                    width: 2,
+                                    color: "silver"
+                                }],
+                            },
+                            plotOptions: {
+                                series: {
+                                    compare: "percent",
+                                    compareBase: 100,
+                                    compareStart: true,
+                                    showInNavigator: false
+                                }
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    var d = new Date(this.x);
+                                    var fd = Highcharts.dateFormat('%Y-%m-%d',
+                                    d); // Highcharts date formatting
+                                    return ["<b>" + fd + "</b>"].concat(
+                                        this.points ?
+                                        this.points.map(function (point) {
+                                            return '<b style="color:' + point
+                                                .series.color + '">' + point
+                                                .series.name + ": </b><b>" +
+                                                point.y + "</b> (" + point.point
+                                                .change.toFixed(2) + "%)";
+                                        }) :
+                                        []
+                                    );
+                                },
+                                valueDecimals: 2,
+                                split: true
+                            },
+                            series: data // using the loaded data
+                        });
+
+                        setTimeout(() => {
+                            window.scrollTo(0, 0);
+                            console.log('html2pdf', html2pdf);
+                            const element = document.getElementById('main-body');
+                            console.log('element', element);
+                            const opt = {
+                            margin: [0, -2],
+                            filename: 'myfile.pdf',
+                            image: { type: 'jpeg', quality: 1 },
+                            html2canvas: { scale: 2, scrollY: 0, scrollX: 0, Y: 0, X: 0},
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                            }
+
+                            //open pdf in new tab
+                            html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
+                            window.open(pdf.output('bloburl'), '_blank');
+                            });
+                        }, 1000);
+
+                        document.getElementById('genpdf').addEventListener('click', function () {
+                            //scroll to 00
+                            
+                        }, 1000)
+                    })
+                    .catch(error => console.error('Error loading the data:', error));
+            //});
+        }, 1000);
+    </script>
+</head>
+<body id="main-body" style="margin: 0">
+    <div
+        style="width: 210mm; height: 296mm; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- CONTAINS THE HEADER AND THE CONTENT -->
+        <div class="header-and-content" style="flex: 1 1 auto;">
+            <div style="height: 100%; display: flex; flex-direction: column">
+                <div class="header"
+                    style="min-height: 29mm;padding-left: 8mm; padding-right: 8mm; background-color: #1E2E53; background-image: url('banner.jpg'); background-size: contain; display: flex;justify-content: space-between; align-items: center; font-size: larger;">
+                    <div class="header-left-text" style="block-size: fit-content;">
+                        <p style="color: white; font-size: 5.5mm;">Performance Report</p>
+                        <p><span style="color: #D0A31B">CUSIP </span><span
+                                style="color: #D0A31B">06368GDV6</span></p>
+                    </div>
+                    <div class="header-logo" style="block-size: fit-content;">
+                        <img src="logo.png" alt="Logo" style="max-height:12mm;width:auto;height:auto;">
+                    </div>
+                </div>
+                <div style="height: 100%; display: flex; flex-direction: column">
+                    <div class="content content-margins" style="flex: 1 1 auto;">
+                        <div style="height: 100%; display: flex; flex-direction: column">
+                            <div class="name-section" style="height: 15mm; display: flex;">
+                                <div class="name-section-left"
+                                    style="width: 60%; height: 100%; display: flex; align-content: space-between;flex-direction: column; justify-content: flex-start;">
+                                    <p class="navy-text" style="font-size: 6.8mm; font-weight: bold; margin: 0">Bank of
+                                        Montreal Income Note
+                                    </p>
+                                    <p style="font-size: 3mm; margin-top: 2mm">FREE TEXT BOX</p>
+                                </div>
+                                <div class="name-section-right" style="width: 40%; height: 100%;  text-align: center">
+                                    <!-- table, pricing date and maturity date, navy header -->
+                                    <table style="width: 100%; height: 100%; border-collapse: collapse;"
+                                        class="dotted-border">
+                                        <tr class="navy-background">
+                                            <td style="color: white; font-size: 3mm; padding: 1mm;"
+                                                class="navy-background dotted-border">
+                                                Pricing Date</td>
+                                            <td style="color: white; font-size: 3mm; padding: 1mm; border-left: none"
+                                                class="navy-background dotted-border">
+                                                Maturity Date</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 2.7mm; font-weight: bold" class="navy-text">December
+                                                23,
+                                                2021</td>
+                                            <td style="font-size: 2.7mm; font-weight: bold" class="navy-text">December
+                                                28,
+                                                2026</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="sub-section-header sub-section-margin">NOTE TERMS</div>
+
+                            <div class="note-terms-section">
+                                <!-- table, 5 rows 2 columns, gray row lines except top and bottom row. Each cell, contains two values, divided in half, with Bold text in the left half and normal text in the right half, add a grey middle line between col 1 and 2 insert dummy text -->
+                                <table
+                                    style="width: 100%; border-collapse: collapse; margin-top: -2mm; margin-bottom: -2mm">
+                                    <tr>
+                                        <td class="grey-border-bottom grey-border-right table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Issuer
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    Bank of Montreal
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="grey-border-bottom table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    CUSIP
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    06368GDV6
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-border-bottom grey-border-right table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Underlying(s)
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    SPX / RTY / NDX
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="grey-border-bottom table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Maturity
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    60 Months
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-border-bottom grey-border-right table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Annualized Yield
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    8.75%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="grey-border-bottom table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Call
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    Autocall Monthly
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-border-bottom grey-border-right table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Principal Protection*
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    30% Barrier
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="grey-border-bottom table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Non-call Period
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    6 Months
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-border-right table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Coupon Protection
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    30%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="table-style-1-col">
+                                            <div class="table-style-1-col-content">
+                                                <div class="table-style-1-col-left-text">
+                                                    Coupons
+                                                </div>
+                                                <div class="table-style-1-col-right-text">
+                                                    Contingent Monthly
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="sub-section-header sub-section-margin">PERFORMANCE ANALYSIS (as of 04/12/2024)
+                            </div>
+                            <div class="performance-analysis-section" style="flex: 1 1 auto;">
+                                <div style="height: 100%; display: flex; flex-direction: column">
+                                    <div class="underlying-table">
+                                        <!-- table with the following headings Underlying Strike Level Breach Level Current Level Performance Distance to Principal Protection. the whole left most col should be gray including the underlying header should be gray. give the table a thick navy outline too. Make the header text navy, and no background.  -->
+                                        <table class="navy-border"
+                                            style="font-size: 2.9mm; width: 100%; border-collapse: collapse; text-align: center">
+                                            <tr class="navy-text"
+                                                style="font-weight: bold;">
+                                                <td class="grey-background">Underlying</td>
+                                                <td>Strike Level</td>
+                                                <td>Breach Level</td>
+                                                <td>Current Level</td>
+                                                <td>Performance</td>
+                                                <td>Distance to Principal Protection</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-background navy-text pa-left-col">S&amp;P 500</td>
+                                                <td>4,000</td>
+                                                <td>3,200</td>
+                                                <td>4,500</td>
+                                                <td>
+                                                    <span class="positive-decimal">12.5%</span>
+                                                </td>
+                                                <td>30%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-background navy-text pa-left-col">Russell 2000</td>
+                                                <td>2,000</td>
+                                                <td>1,600</td>
+                                                <td>2,500</td>
+                                                <td>
+                                                    <span class="negative-decimal">-25%</span>
+                                                </td>
+                                                <td>30%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-background navy-text pa-left-col">Nasdaq 100</td>
+                                                <td>12,000</td>
+                                                <td>9,600</td>
+                                                <td>13,500</td>
+                                                <td>
+                                                    <span class="positive-decimal">12.5%</span>
+                                                </td>
+                                                <td>30%</td>
+                                            </tr>
+                                        </table>
+
+
+                                    </div>
+                                    <div class="performance-table navy-border sub-section-margin"
+                                        style="margin-bottom: 0; flex: 1 1 auto;">
+                                        <p style="margin-left: 3mm;margin-top: 1mm;font-size: 3mm;">Underlying(s) Performance and Bid Price</p>
+                                        <div id="graph-rendered">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer content-margins" style="display: flex; flex-direction: column">
+            <img src="footerLogo.png" style="width: 100%;">
+            <p class="footer-text" style="width: 88%; margin-top: -6mm">
+                This Performance Report has been prepared for use only by professional financial advisors. Principal
+                Protection and any returns are subject to the credit risk of the issuer and the individual
+                terms of the offering documents. There is no guarantee that this product will generate a positive
+                return. Any applicable principal protection will be realized only at maturity and could be less
+                than the original amount invested.
+            </p>
+        </div>
+    </div>
+    
+    <div class="html2pdf__page-break"></div>
+    
+    <div
+        style="width: 210mm; height: 296mm; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- CONTAINS THE HEADER AND THE CONTENT -->
+        <div class="header-and-content" style="flex: 1 1 auto;">
+            <div style="height: 100%; display: flex; flex-direction: column">
+                <div class="header"
+                    style="min-height: 29mm;padding-left: 8mm; padding-right: 8mm; background-color: #1E2E53; background-image: url('banner.jpg'); background-size: contain; display: flex;justify-content: space-between; align-items: center; font-size: larger;">
+                    <div class="header-left-text" style="block-size: fit-content;">
+                        <p style="color: white">Performance Report</p>
+                        <p><span style="color: #D0A31B">CUSIP </span><span
+                                style="color: #D0A31B">06368GDV6</span></p>
+                    </div>
+                    <div class="header-logo" style="block-size: fit-content;">
+                        <img src="logo.png" alt="Logo" style="max-height:12mm;width:auto;height:auto;">
+                    </div>
+                </div>
+                <div style="height: 100%; display: flex; flex-direction: column">
+                    <div class="content content-margins" style="flex: 1 1 auto;">
+                        <div style="height: 100%; display: flex; flex-direction: column">
+                            <div class="sub-section-header sub-section-margin">NOTE PERFORMANCE</div>
+                            <div class="note-perf-section" style="display: flex;">
+                                <!-- table navy border, gray header row, columns bid price realised gain adn total coupons paid -->
+                                <table class="navy-border note-performance-table" style="table-layout: fixed; font-size: 3mm; width: 100%; border-collapse: collapse;
+                                    text-align: center;">
+                                    <tr class="navy-text grey-background" style="font-weight: bold;">
+                                        <td>Bid Price</td>
+                                        <td>Realized Gain</td>
+                                        <td>Total Coupons Paid</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="grey-border-right">97.77</td>
+                                        <td class="grey-border-right">8.00%</td>
+                                        <td class="grey-border-right">8/9 (88.89%)</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="coupon-and-call-events sub-section-margin" style="display: flex;">
+                                <div class="coupon-events" style="width: 50%; margin-right: 2mm">
+                                    <div class="sub-section-header">COUPON EVENTS</div>
+                                    <div class="recent-events sub-section-margin">
+                                        <p class="gold events-header">RECENT EVENTS</p>
+                                        <table class="navy-border note-performance-table"
+                                            style="table-layout: fixed; font-size: 3mm; width: 100%; border-collapse: collapse; text-align: center;">
+                                            <tr class="navy-text grey-background" style="font-weight: bold;">
+                                                <td>Date</td>
+                                                <td>Coupon Protection</td>
+                                                <td>Underlying Performance</td>
+                                                <td>Coupon Result</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Feb-2024</td>
+                                                <td class="grey-border-right">30.00%</td>
+                                                <td class="grey-border-right positive-decimal">+0.79%</td>
+                                                <td class="grey-border-right positive-decimal icon-and-text"><img
+                                                        src="check.svg" class="icon" />1.00%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Mar-2024</td>
+                                                <td class="grey-border-right">30.00%</td>
+                                                <td class="grey-border-right negative-decimal">-32.15%</td>
+                                                <td class="grey-border-right icon-and-text"><img src="x.png"
+                                                        class="icon" />0.00%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Apr-2024</td>
+                                                <td class="grey-border-right">30.00%</td>
+                                                <td class="grey-border-right negative-decimal">-15.60%</td>
+                                                <td class="grey-border-right positive-decimal icon-and-text"><img
+                                                        src="check.svg" class="icon" />1.00%</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="next-events sub-section-margin">
+                                        <p class="gold events-header">NEXT EVENTS</p>
+                                        <table class="navy-border note-performance-table"
+                                            style="table-layout: fixed; font-size: 3mm; width: 100%; border-collapse: collapse; text-align: center;">
+                                            <tr class="navy-text grey-background" style="font-weight: bold;">
+                                                <td>Date</td>
+                                                <td>Coupon Protection</td>
+                                                <td>Underlying Performance</td>
+                                                <td>Potential Coupon</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-May-2024</td>
+                                                <td class="grey-border-right">30.00%</td>
+                                                <td class="grey-border-right negative-decimal">-2.50%</td>
+                                                <td class="grey-border-right">1.00%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Jun-2024</td>
+                                                <td class="grey-border-right">30.00%</td>
+                                                <td class="grey-border-right negative-decimal">-2.50%</td>
+                                                <td class="grey-border-right">1.00%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Jul-2024</td>
+                                                <td class="grey-border-right">30.00%</td>
+                                                <td class="grey-border-right negative-decimal">-2.50%</td>
+                                                <td class="grey-border-right">1.00%</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="call-events" style="width: 50%; margin-left: 2mm">
+                                    <div class="sub-section-header">CALL EVENTS</div>
+                                    <div class="recent-events sub-section-margin">
+                                        <p class="gold events-header">RECENT EVENTS</p>
+                                        <table class="navy-border note-performance-table"
+                                            style="table-layout: fixed; font-size: 3mm; width: 100%; border-collapse: collapse; text-align: center;">
+                                            <tr class="navy-text grey-background" style="font-weight: bold;">
+                                                <td>Date</td>
+                                                <td>Autocall Level</td>
+                                                <td>Underlying Performance</td>
+                                                <td>Autocall Result</td>
+                                            </tr>
+                                            <tr class="non-call-period" style="height: 20mm">
+                                                <td colspan="4">
+                                                    <p style="z-index: 9999;">Non-Call Period</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Apr-2024</td>
+                                                <td class="grey-border-right">97.50%</td>
+                                                <td class="grey-border-right negative-decimal">-15.60%</td>
+                                                <td class="grey-border-right icon-and-text"><img src="x.png"
+                                                        class="icon" />Not Called</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="next-events sub-section-margin">
+                                        <p class="gold events-header">NEXT EVENTS</p>
+                                        <table class="navy-border note-performance-table"
+                                            style="table-layout: fixed; font-size: 3mm; width: 100%; border-collapse: collapse; text-align: center;">
+                                            <tr class="navy-text grey-background" style="font-weight: bold;">
+                                                <td>Date</td>
+                                                <td>Autocall Level</td>
+                                                <td>Underlying Performance</td>
+                                                <td>Potential Autocall</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-May-2024</td>
+                                                <td class="grey-border-right">95.00%</td>
+                                                <td class="grey-border-right negative-decimal">-2.50%</td>
+                                                <td class="grey-border-right">Pending</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Jun-2024</td>
+                                                <td class="grey-border-right">92.50%</td>
+                                                <td class="grey-border-right negative-decimal">-2.50%</td>
+                                                <td class="grey-border-right">Pending</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="grey-border-right">06-Jul-2024</td>
+                                                <td class="grey-border-right">90.00%</td>
+                                                <td class="grey-border-right negative-decimal">-2.50%</td>
+                                                <td class="grey-border-right">Pending</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="disclaimer footer-text">
+                                <p>
+                                    This investment may not be suitable for all investors and considered complex
+                                    investment
+                                    products. Such products contain unique features, risk, terms, conditions, fees,
+                                    charges
+                                    and expenses specific to
+                                    each product. Return of principal is not guaranteed and is subject to the credit
+                                    risk of
+                                    the Counterparty. Investments in complex products are subject to the risks of the
+                                    underlying reference asset classes to
+                                    which the product may be linked, which include, but are not limited to, market risk,
+                                    liquidity risk, call risk, income risk as well as other risks associated with
+                                    foreign,
+                                    developing or emerging markets, such as
+                                    currency, political, and economic risks.
+                                    <br></br>
+                                    <br></br>
+                                    Depending upon the particular complex product, participation in any underlying
+                                    Market
+                                    Linked Product is subject to certain caps and restrictions. Any investment product
+                                    with
+                                    leverage associated may work
+                                    for or against the investor. Market-Linked Products are subject to the credit risk
+                                    of
+                                    the issuer. Investors who sell complex products or Market Linked CDs or Principal
+                                    Protected Notes prior to maturity are
+                                    subject to the risk of loss of principal, as there may not be an active secondary
+                                    market.
+                                    The information in this presentation is subject to change without notice. Causeway
+                                    Securities, LLC does not warrant the accuracy or completeness of any information
+                                    contained herein and provides no
+                                    assurance that this information is, in fact, accurate. Data provided by third-party
+                                    sources is believed to be reliable, and there is no representation or warranty as to
+                                    the
+                                    current accuracy of, or liability for,
+                                    decisions made based on this material.
+                                    <br></br>
+                                    <br></br>
+                                    The relevance of this investment strategy will depend on an investor's individual
+                                    financial risk, financial situation, tax status, time horizon and objectives. This
+                                    communication should be used for informational
+                                    purposes only and should not be construed as specific tax, legal or investment
+                                    advice.
+                                    These statements are not guarantees of future performance and undue reliance should
+                                    not
+                                    be placed on them.
+                                    <br></br>
+                                    <br></br>
+                                    Before you invest in any offering, you should read the registration statement and
+                                    prospectus, and other documents that the issuer filed with SEC. You may get these
+                                    documents by visiting EDGAR on the
+                                    SEC website at http://www.sec.gov/.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer content-margins" style="display: flex; flex-direction: column">
+            <img src="footerLogo.png" style="width: 100%;">
+            <p class="footer-text" style="width: 88%; margin-top: -6mm">
+                Causeway Securities, LLC is a SEC registered broker-dealer and member of FINRA and SIPC. Causeway
+                Securities, LLC act as distributor of structured notes and is not an issuer or
+                guarantor of any securities.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
